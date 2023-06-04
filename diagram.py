@@ -100,7 +100,7 @@ class Diagram:
 
     def build_appended(self):
         recordings_types_per_day: Dict[int, float] = dict()
-        for rec_idx in range(0, len(self.appended_percent) - 1):
+        for rec_idx in range(0, len(self.appended_percent)):
             recordings_types_per_day[self.appended_percent[rec_idx]] = recordings_types_per_day.get(
                 self.appended_percent[rec_idx], 0) + 1
         # Normalize data and plot a diagram for current day

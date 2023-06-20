@@ -83,12 +83,13 @@ class Scanner:
                     self.counter_access_blocked_attempts = 0
                 except json.JSONDecodeError:
                     # It is an empty request, reduce the date
-                    self.counter_no_info += 1
                     date = datetime.strptime(self.application_date, '%Y%m%d')
-                    date -= timedelta(days=1)
-                    days_scanned += 1
+                    days_to_subtract = 3 if date.weekday() == 0 else 1
+                    date -= timedelta(days=days_to_subtract)
+                    days_scanned += days_to_subtract
+                    self.counter_no_info += days_to_subtract
                     self.application_date = date.strftime('%Y%m%d')
-                    if self.counter_no_info == MAX_CHECK_DEPTH_DAYS:
+                    if self.counter_no_info >= MAX_CHECK_DEPTH_DAYS:
                         # No info during more than 'MAX_CHECK_DEPTH_DAYS' days:
                         # 1) get back to day + 'MAX_CHECK_DEPTH_DAYS';
                         # 2) decrease application number.

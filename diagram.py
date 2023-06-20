@@ -44,8 +44,9 @@ statuses_colors = {0: 'darkgreen',
 class Diagram:
 
     def __init__(self):
-        self.fig, self.ax = plt.subplots(figsize=(9.2, 5))
+        self.fig, self.ax = plt.subplots()
         self.ax.tick_params(labelrotation=45)
+        self.legend = self.ax.legend(internal_statuses)
         self.filename: str = ''
 
         self.appended_date: str = ''
@@ -81,11 +82,13 @@ class Diagram:
                 for rec_type_idx, _ in enumerate(recordings_freq):
                     height_offset += recordings_freq[rec_type_idx]
                     plot_start = 1 - height_offset
-                    self.ax.bar(recordings_date[rec_idx], recordings_freq[rec_type_idx],
-                                bottom=plot_start,
-                                width=0.8,
-                                label=recordings_type[rec_type_idx],
-                                color=statuses_colors[recordings_type[rec_type_idx]])
+                    bar = self.ax.bar(recordings_date[rec_idx], recordings_freq[rec_type_idx],
+                                      bottom=plot_start,
+                                      width=0.8,
+                                      label=recordings_type[rec_type_idx],
+                                      color=statuses_colors[recordings_type[rec_type_idx]],
+                                      edgecolor='black', linewidth=2)
+                    self.ax.bar_label(bar, label_type='center', color='white')
                 recordings_types_per_day.clear()
             time.sleep(0.01)
             plt.draw()
@@ -104,9 +107,9 @@ class Diagram:
             recordings_types_per_day[self.appended_percent[rec_idx]] = recordings_types_per_day.get(
                 self.appended_percent[rec_idx], 0) + 1
         # Normalize data and plot a diagram for current day
-        normalization_factor = 1.0 / sum(recordings_types_per_day.values())
+        normalization_factor = 1 / sum(recordings_types_per_day.values())
         for item_idx in recordings_types_per_day:
-            recordings_types_per_day[item_idx] = recordings_types_per_day[item_idx] * normalization_factor
+            recordings_types_per_day[item_idx] = round(recordings_types_per_day[item_idx] * normalization_factor, 2)
         # Sort data by internal status (in percents)
         recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
         # Start plotting
@@ -116,11 +119,15 @@ class Diagram:
         for rec_type_idx, _ in enumerate(recordings_freq):
             height_offset += recordings_freq[rec_type_idx]
             plot_start = 1 - height_offset
-            self.ax.bar(self.appended_date, recordings_freq[rec_type_idx],
-                        bottom=plot_start,
-                        width=0.8,
-                        label=recordings_type[rec_type_idx],
-                        color=statuses_colors[recordings_type[rec_type_idx]])
+            bar = self.ax.bar(self.appended_date, recordings_freq[rec_type_idx],
+                              bottom=plot_start,
+                              width=0.8,
+                              label=recordings_type[rec_type_idx],
+                              color=statuses_colors[recordings_type[rec_type_idx]],
+                              edgecolor='black', linewidth=2)
+            self.ax.bar_label(bar, label_type='center', color='black', rotation=90)
+        # self.legend = plt.legend(ncols=len(statuses_colors), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')
+        # self.legend = self.ax.legend(internal_statuses)
         recordings_types_per_day.clear()
         self.appended_percent.clear()
         self.appended_date = ''

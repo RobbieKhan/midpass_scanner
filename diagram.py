@@ -48,9 +48,10 @@ class Diagram:
             # Check if it is already another day
             if recordings_date[rec_idx] != recordings_date[rec_idx + 1]:
                 # Next day is another day. Normalize data and plot a diagram for current day
-                normalization_factor = 1.0 / sum(recordings_types_per_day.values())
+                recordings_sum = sum(recordings_types_per_day.values())
                 for item_idx in recordings_types_per_day:
-                    recordings_types_per_day[item_idx] = recordings_types_per_day[item_idx] * normalization_factor
+                    recordings_types_per_day[item_idx] = recordings_types_per_day[item_idx] / recordings_sum
+                recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
                 # Sort data by internal status (in percents)
                 recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
                 # Start plotting
@@ -85,9 +86,10 @@ class Diagram:
             recordings_types_per_day[self.appended_percent[rec_idx]] = recordings_types_per_day.get(
                 self.appended_percent[rec_idx], 0) + 1
         # Normalize data and plot a diagram for current day
-        normalization_factor = 1 / sum(recordings_types_per_day.values())
+        recordings_sum = sum(recordings_types_per_day.values())
         for item_idx in recordings_types_per_day:
-            recordings_types_per_day[item_idx] = round(recordings_types_per_day[item_idx] * normalization_factor, 2)
+            recordings_types_per_day[item_idx] = round(recordings_types_per_day[item_idx] / recordings_sum, 2)
+        recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
         # Sort data by internal status (in percents)
         recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
         # Start plotting

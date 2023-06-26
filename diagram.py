@@ -5,17 +5,8 @@ import matplotlib.pyplot as plt
 from typing import List, Dict
 from collections import OrderedDict
 
-
-statuses_colors = {0: 'darkgreen',
-                   5: 'darkred',
-                   10: 'red',
-                   20: 'lightcoral',
-                   30: 'orange',
-                   60: 'gold',
-                   70: 'palegoldenrot',
-                   80: 'palegreen',
-                   90: 'green',
-                   100: 'darkgreen'}
+STATUS_COLOR_IDX = 0
+STATUS_LABEL_IDX = 1
 
 
 class Diagram:
@@ -29,6 +20,16 @@ class Diagram:
         self.appended_date: str = ''
         self.appended_percent: List[int] = list()
 
+        self.statuses: dict = {5: ['#660033', 'Заявление принято'],
+                               10: ['#990033', 'Заявление отправлено в РФ'],
+                               20: ['#ff3300', 'В обработке'],
+                               30: ['#ff9900', 'На согласовании'],
+                               60: ['#cc9900', 'Одобрен'],
+                               70: ['#99cc00', 'В печати'],
+                               80: ['#669900', 'Отправлен в консульство'],
+                               90: ['#009933', 'В консульстве'],
+                               100: ['#006600', 'Готов к выдаче'],
+                               0: ['#003300', 'Выдан \\ отменен']}
     def set_filename(self, filename: str):
         self.filename = filename
 
@@ -63,7 +64,7 @@ class Diagram:
                                       bottom=plot_start,
                                       width=0.8,
                                       label=recordings_type[rec_type_idx],
-                                      color=statuses_colors[recordings_type[rec_type_idx]],
+                                      color=self.statuses[recordings_type[rec_type_idx]][STATUS_COLOR_IDX],
                                       edgecolor='black', linewidth=2)
                     self.ax.bar_label(bar, label_type='center', color='white')
                 recordings_types_per_day.clear()
@@ -100,7 +101,7 @@ class Diagram:
                               bottom=plot_start,
                               width=0.8,
                               label=recordings_type[rec_type_idx],
-                              color=statuses_colors[recordings_type[rec_type_idx]],
+                              color=self.statuses[recordings_type[rec_type_idx]][STATUS_COLOR_IDX],
                               edgecolor='black', linewidth=2)
             self.ax.bar_label(bar, label_type='center', color='black', rotation=90)
         # self.legend = plt.legend(ncols=len(statuses_colors), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')

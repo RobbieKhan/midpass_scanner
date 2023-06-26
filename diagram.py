@@ -2,6 +2,7 @@ import time
 import constants
 import threading
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from typing import List, Dict
 from collections import OrderedDict
 
@@ -14,7 +15,6 @@ class Diagram:
     def __init__(self):
         self.fig, self.ax = plt.subplots()
         self.ax.tick_params(labelrotation=45)
-        self.legend = self.ax.legend(internal_statuses)
         self.filename: str = ''
 
         self.appended_date: str = ''
@@ -30,6 +30,9 @@ class Diagram:
                                90: ['#009933', 'В консульстве'],
                                100: ['#006600', 'Готов к выдаче'],
                                0: ['#003300', 'Выдан \\ отменен']}
+        # Create custom legend based on statuses above
+        self.__create_legend()
+
     def set_filename(self, filename: str):
         self.filename = filename
 
@@ -106,9 +109,17 @@ class Diagram:
                               color=self.statuses[recordings_type[rec_type_idx]][STATUS_COLOR_IDX],
                               edgecolor='black', linewidth=2)
             self.ax.bar_label(bar, label_type='center', color='black', rotation=90)
-        # self.legend = plt.legend(ncols=len(statuses_colors), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')
-        # self.legend = self.ax.legend(internal_statuses)
         recordings_types_per_day.clear()
         self.appended_percent.clear()
         self.appended_date = ''
         plt.draw()
+
+    def __create_legend(self):
+        patches = list()
+        for idx, _ in enumerate(self.statuses):
+            color = list(self.statuses.values())[idx][STATUS_COLOR_IDX]
+            label = list(self.statuses.values())[idx][STATUS_LABEL_IDX]
+            print(idx, color)
+            patch = mpatches.Patch(color=color, label=label)
+            patches.append(patch)
+        self.fig.legend(handles=patches, ncol=len(patches) / 2, loc='upper center')

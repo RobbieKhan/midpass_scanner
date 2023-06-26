@@ -1,6 +1,4 @@
-from scanner import Scanner
-import threading
-import matplotlib.pyplot as plt
+from network.scanner import Scanner
 
 if __name__.__eq__('__main__'):
     scan = Scanner()

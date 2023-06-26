@@ -119,7 +119,6 @@ class Diagram:
         for idx, _ in enumerate(self.statuses):
             color = list(self.statuses.values())[idx][STATUS_COLOR_IDX]
             label = list(self.statuses.values())[idx][STATUS_LABEL_IDX]
-            print(idx, color)
             patch = mpatches.Patch(color=color, label=label)
             patches.append(patch)
         self.fig.legend(handles=patches, ncol=len(patches) / 2, loc='upper center')

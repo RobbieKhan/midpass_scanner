@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import requests
 import constants
 import threading
+from ui.diagram import Diagram
 from datetime import datetime, timedelta
-from diagram import Diagram
 from typing import Optional
 
 REQUEST_PERIOD_SEC = 0.1  # requests are done every 1 second

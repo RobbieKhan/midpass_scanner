@@ -1,8 +1,8 @@
 import time
-import constants
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from ui.constants import *
 from typing import List, Dict
 from collections import OrderedDict
 
@@ -37,7 +37,7 @@ class Diagram:
         self.filename = filename
 
     def build_from_file(self):
-        file = open(constants.RESULTS_DIRECTORY_NAME + self.filename, 'r')
+        file = open(RESULTS_DIRECTORY_NAME + self.filename, 'r')
         file_recordings: List[str] = file.readlines()
         file.close()
         recordings_number: int = len(file_recordings)

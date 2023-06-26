@@ -2,9 +2,9 @@ import json
 import time
 import matplotlib.pyplot as plt
 import requests
-import constants
 import threading
 from ui.diagram import Diagram
+from ui.constants import *
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -50,7 +50,7 @@ class Scanner:
     def __scan(self):
         # Create file with results
         filename = f'results_{datetime.now().strftime("%Y%m%d")}.txt'
-        file = open(constants.RESULTS_DIRECTORY_NAME + filename, 'w')
+        file = open(RESULTS_DIRECTORY_NAME + filename, 'w')
         self.diagram.set_filename(filename)
         # Start scanning
         days_scanned = 0
@@ -58,9 +58,9 @@ class Scanner:
         previous_date = None
         while True:
             time.sleep(REQUEST_PERIOD_SEC)
-            application_full_url = constants.REQUEST_URL + Scanner.APPLICATION_TYPE + self.consulate_code + \
+            application_full_url = REQUEST_URL + Scanner.APPLICATION_TYPE + self.consulate_code + \
                                    self.application_date + str(self.application_number).zfill(8)
-            r = requests.get(application_full_url, headers=constants.REQUEST_REQUIRED_HEADERS)
+            r = requests.get(application_full_url, headers=REQUEST_REQUIRED_HEADERS)
             # Parse result
             if 200 == r.status_code:
                 # It maybe a valid result or just an empty request if such application is missing

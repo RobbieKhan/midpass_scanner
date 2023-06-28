@@ -17,7 +17,7 @@ MAX_ACCESS_BLOCKED_ATTEMPTS_NUM = MAX_ACCESS_BLOCKED_ATTEMPTS_MIN * 60 / REQUEST
 class Scanner:
     APPLICATION_TYPE = '2000'
 
-    def __init__(self):
+    def __init__(self, diagram: Optional[Diagram] = None):
         self.consulate_code: Optional[str] = None
         self.application_date: Optional[str] = None
         self.application_number: Optional[int] = None
@@ -28,7 +28,7 @@ class Scanner:
         self.counter_access_blocked_attempts: int = 0
         self.counter_no_info: int = 0
 
-        self.diagram = Diagram()
+        self.diagram: Optional[Diagram] = diagram
 
     def set_consulate_code(self, code: int):
         self.consulate_code = str(code)
@@ -51,7 +51,8 @@ class Scanner:
         # Create file with results
         filename = f'results_{datetime.now().strftime("%Y%m%d")}.txt'
         file = open(RESULTS_DIRECTORY_NAME + filename, 'w')
-        self.diagram.set_filename(filename)
+        if self.diagram is not None:
+            self.diagram.set_filename(filename)
         # Start scanning
         days_scanned = 0
         applications_scanned = 0
@@ -71,11 +72,12 @@ class Scanner:
                     print(result)
                     file.write(result + '\n')
                     # Notify diagram builder
-                    if previous_date != json_response['receptionDate'] and previous_date is not None:
-                        # Date has changed. Build all collected data for the previous day
-                        self.diagram.build_appended()
-                    previous_date = json_response['receptionDate']
-                    self.diagram.append_data(date=previous_date, percent=json_response['internalStatus']['percent'])
+                    if self.diagram is not None:
+                        if previous_date != json_response['receptionDate'] and previous_date is not None:
+                            # Date has changed. Build all collected data for the previous day
+                            self.diagram.build_appended()
+                        previous_date = json_response['receptionDate']
+                        self.diagram.append_data(date=previous_date, percent=json_response['internalStatus']['percent'])
                     # Go to further application
                     self.application_number -= 1
                     applications_scanned += 1
@@ -114,7 +116,8 @@ class Scanner:
 
             if (self.depth_applications is not None and applications_scanned > self.depth_applications) or \
                     (self.depth_days is not None and self.depth_days < days_scanned):
-                self.diagram.build_appended()
+                if self.diagram is not None:
+                    self.diagram.build_appended()
                 print('Script is finished!')
                 break
 

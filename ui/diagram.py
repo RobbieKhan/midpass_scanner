@@ -117,8 +117,11 @@ class Diagram:
     def __create_legend(self):
         patches = list()
         for idx, _ in enumerate(self.statuses):
+            if 90 == list(self.statuses.keys())[idx]:
+                # This status is never met anyway
+                continue
             color = list(self.statuses.values())[idx][STATUS_COLOR_IDX]
             label = list(self.statuses.values())[idx][STATUS_LABEL_IDX]
             patch = mpatches.Patch(color=color, label=label)
             patches.append(patch)
-        self.fig.legend(handles=patches, ncol=len(patches) / 2, loc='upper center')
+        self.fig.legend(handles=patches, ncol=len(patches) / 3, loc='upper center')

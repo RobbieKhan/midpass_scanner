@@ -1,9 +1,8 @@
-import tkinter
+import customtkinter
 from network.scanner import Scanner
 from ui.constants import *
 from ui.window_leftbar import UI_WindowLeftBar
 from ui.window_graph import UI_WindowGraph
-from tkinter import ttk
 
 
 class UI_WindowMain:
@@ -11,25 +10,22 @@ class UI_WindowMain:
     def __init__(self, root):
         self.root = root
         self.root.protocol('WM_DELETE_WINDOW', self.__ui_quit)
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
 
         self.scanner = Scanner()
 
         self.window_left_bar = UI_WindowLeftBar(self.root, width=GUI_LEFT_BAR_WIDTH, height=GUI_HEIGHT)
         self.window_left_bar.set_cb_button_scan(self.__start_scanning)
-        # self.window_right_bar = UI_WindowRightBar(self.root, width=GUI_RIGHT_BAR_WIDTH, height=GUI_HEIGHT, style='Frame2.TFrame')
-        self.window_left_bar.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=True, anchor=tkinter.W)
-        # self.window_right_bar.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True, anchor=tkinter.W)
+        self.window_graph = UI_WindowGraph(self.root, width=GUI_RIGHT_BAR_WIDTH, height=GUI_HEIGHT)
+
+        self.window_left_bar.grid(row=0, column=0, sticky=customtkinter.NSEW)
+        self.window_graph.grid(row=0, column=1, sticky=customtkinter.NSEW)
 
     def ui_start_mainloop(self):
         # self.root.config(menu=self.menu_bar)
         # Start mainloop
         self.root.mainloop()
-
-    def __resize(self, event):
-        self.root.update()
-        width = self.root.winfo_width()
-        # self.window_right_bar.config(width=width)
-        self.root.update_idletasks()
 
     def __ui_quit(self):
         self.root.quit()

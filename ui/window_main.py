@@ -13,14 +13,15 @@ class UI_WindowMain:
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
 
-        self.scanner = Scanner()
-
         self.window_left_bar = UI_WindowLeftBar(self.root, width=GUI_LEFT_BAR_WIDTH, height=GUI_HEIGHT)
         self.window_left_bar.set_cb_button_scan(self.__start_scanning)
         self.window_graph = UI_WindowGraph(self.root, width=GUI_RIGHT_BAR_WIDTH, height=GUI_HEIGHT)
 
         self.window_left_bar.grid(row=0, column=0, sticky=customtkinter.NSEW)
         self.window_graph.grid(row=0, column=1, sticky=customtkinter.NSEW)
+
+        self.scanner = Scanner()
+        self.scanner.set_diagram_instance(self.window_graph.get_diagram_instance())
 
     def ui_start_mainloop(self):
         # self.root.config(menu=self.menu_bar)

@@ -15,4 +15,5 @@ class UI_WindowGraph(customtkinter.CTkFrame):
         canvas.draw()
         canvas.get_tk_widget().pack(side="top", fill='both', expand=True)
 
-
+    def get_diagram_instance(self) -> Diagram:
+        return self.diagram

@@ -43,9 +43,11 @@ class Scanner:
         self.depth_days = days
         self.depth_applications = applications
 
+    def set_diagram_instance(self, diagram: Diagram):
+        self.diagram = diagram
+
     def start_scanning(self):
         threading.Thread(target=self.__scan, daemon=True).start()
-        plt.show()
 
     def __scan(self):
         # Create file with results

@@ -1,4 +1,6 @@
 from ui.constants import GUI_LEFT_BAR_WIDTH, GUI_HEIGHT
+from widgets.entry_validator import validator_uint
+from widgets.custom_entry import CTkEntry
 from typing import Callable, Optional
 import customtkinter
 
@@ -34,14 +36,23 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
                                                                   text='число анкет',
                                                                   command=lambda: print('Apps are chosen'),
                                                                   variable=self.radio_var_scan_goal, value='apps')
-        self.entry_scan_days = customtkinter.CTkEntry(master=self,
-                                                      width=75,
-                                                      placeholder_text='xxx',
-                                                      justify=customtkinter.CENTER)
-        self.entry_scan_apps = customtkinter.CTkEntry(master=self,
-                                                      width=75,
-                                                      placeholder_text='xxx',
-                                                      justify=customtkinter.CENTER)
+        validator_function = root.register(validator_uint)
+        self.entry_scan_days = CTkEntry(master=self,
+                                        width=75,
+                                        placeholder_text='xxx',
+                                        validate='all',
+                                        validatecommand=(validator_function, '%P', '%S'),
+                                        limits=(1, None),
+                                        justify=customtkinter.CENTER)
+        self.entry_scan_days.set('10')
+        self.entry_scan_apps = CTkEntry(master=self,
+                                        width=75,
+                                        placeholder_text='xxx',
+                                        validate='all',
+                                        validatecommand=(validator_function, '%P', '%S'),
+                                        limits=(1, None),
+                                        justify=customtkinter.CENTER)
+        self.entry_scan_apps.set('100')
         self.button_scan = customtkinter.CTkButton(master=self,
                                                    text=BUTTON_LABEL_START_SCAN,
                                                    command=self.__event_scan)

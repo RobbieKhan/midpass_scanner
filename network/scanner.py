@@ -5,7 +5,7 @@ import threading
 from ui.diagram import Diagram
 from ui.constants import *
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Callable
 
 REQUEST_PERIOD_SEC = 0.1  # requests are done every 1 second
 MAX_CHECK_DEPTH_DAYS = 10  # the period of time during which the application information is searched.
@@ -30,6 +30,7 @@ class Scanner:
         self.diagram: Optional[Diagram] = diagram
 
         self.is_scan_in_progress: bool = False
+        self.cb_finished_scan: Optional[Callable] = None
 
     def set_consulate_code(self, code: int):
         self.consulate_code = str(code)
@@ -50,6 +51,9 @@ class Scanner:
     def start_scanning(self):
         self.is_scan_in_progress = True
         threading.Thread(target=self.__scan, daemon=True).start()
+
+    def set_cb_finished_scan(self, cb: Optional[Callable]):
+        self.cb_finished_scan = cb
 
     def __scan(self):
         # Create file with results
@@ -125,6 +129,8 @@ class Scanner:
                 if self.diagram is not None:
                     self.diagram.build_appended()
                 print('Script is finished!')
+                if self.cb_finished_scan is not None:
+                    self.cb_finished_scan()
                 break
 
         file.close()

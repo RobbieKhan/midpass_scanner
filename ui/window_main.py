@@ -23,6 +23,7 @@ class UI_WindowMain:
 
         self.scanner = Scanner()
         self.scanner.set_diagram_instance(self.window_graph.get_diagram_instance())
+        self.scanner.set_cb_finished_scan(self.window_left_bar.reconfigure_button_scan)
 
     def ui_start_mainloop(self):
         # self.root.config(menu=self.menu_bar)

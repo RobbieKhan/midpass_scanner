@@ -55,7 +55,7 @@ class Diagram:
                 recordings_sum = sum(recordings_types_per_day.values())
                 for item_idx in recordings_types_per_day:
                     recordings_types_per_day[item_idx] = recordings_types_per_day[item_idx] / recordings_sum
-                recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
+                recordings_types_per_day[next(iter(recordings_types_per_day))] += 1.0 - sum(recordings_types_per_day.values())
                 # Sort data by internal status (in percents)
                 recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
                 # Start plotting
@@ -85,7 +85,7 @@ class Diagram:
         self.appended_percent.append(percent)
 
     def build_appended(self):
-        if not self.appended_date:
+        if not self.appended_percent:
             return
         recordings_types_per_day: Dict[int, float] = dict()
         for rec_idx in range(0, len(self.appended_percent)):
@@ -95,7 +95,7 @@ class Diagram:
         recordings_sum = sum(recordings_types_per_day.values())
         for item_idx in recordings_types_per_day:
             recordings_types_per_day[item_idx] = round(recordings_types_per_day[item_idx] / recordings_sum, 2)
-        recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
+        recordings_types_per_day[next(iter(recordings_types_per_day))] += 1.0 - sum(recordings_types_per_day.values())
         # Sort data by internal status (in percents)
         recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
         # Start plotting

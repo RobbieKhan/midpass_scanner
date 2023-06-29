@@ -3,6 +3,7 @@ from network.scanner import Scanner
 from ui.constants import *
 from ui.window_leftbar import UI_WindowLeftBar
 from ui.window_graph import UI_WindowGraph
+from typing import Optional
 
 
 class UI_WindowMain:
@@ -34,15 +35,20 @@ class UI_WindowMain:
     def __start_scanning(self):
         if not self.scanner.is_scan_in_progress:
             if self.window_left_bar.is_application_number_valid():
-                self.scanner.set_consulate_code(self.window_left_bar.get_consulate_code())
-                self.scanner.set_application_date(self.window_left_bar.get_application_date_str())
-                self.scanner.set_application_number(self.window_left_bar.get_short_application_number())
-                self.scanner.set_scanning_depth(applications=571, days=73)
-                self.scanner.start_scanning()
-                # Reconfigure scan button - change its text on opposite
-                self.window_left_bar.reconfigure_button_scan()
-                # Clear an old graph
-                self.window_graph.get_diagram_instance().clear()
+                self.goal_days: Optional[int] = self.window_left_bar.get_goal_days()
+                self.goal_apps: Optional[int] = self.window_left_bar.get_goal_apps()
+                if self.goal_apps is None and self.goal_days is None:
+                    print('Goal is not set')
+                else:
+                    self.scanner.set_consulate_code(self.window_left_bar.get_consulate_code())
+                    self.scanner.set_application_date(self.window_left_bar.get_application_date_str())
+                    self.scanner.set_application_number(self.window_left_bar.get_short_application_number())
+                    self.scanner.set_scanning_depth(applications=self.goal_apps, days=self.goal_days)
+                    self.scanner.start_scanning()
+                    # Reconfigure scan button - change its text on opposite
+                    self.window_left_bar.reconfigure_button_scan()
+                    # Clear an old graph
+                    self.window_graph.get_diagram_instance().clear()
             else:
                 print('Application number is invalid')
         else:

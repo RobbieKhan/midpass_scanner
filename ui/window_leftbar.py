@@ -83,6 +83,18 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
             return application_number[9:17]
         return None
 
+    def get_goal_days(self) -> Optional[int]:
+        days: str = self.entry_scan_days.get()
+        if self.radio_var_scan_goal.get() != 'days' or not days:
+            return None
+        return int(days)
+
+    def get_goal_apps(self) -> Optional[int]:
+        apps: str = self.entry_scan_apps.get()
+        if self.radio_var_scan_goal.get() != 'apps' or not apps:
+            return None
+        return int(apps)
+
     def reconfigure_button_scan(self):
         if self.button_scan.cget('text') == BUTTON_LABEL_START_SCAN:
             self.button_scan.configure(text=BUTTON_LABEL_STOP_SCAN)

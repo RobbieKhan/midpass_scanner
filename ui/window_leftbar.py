@@ -16,6 +16,7 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
                          fg_color='#fcfcfc',
                          corner_radius=10,
                          **kw)
+        self.root = root
         self.label_app_num = customtkinter.CTkLabel(master=self,
                                                     text='Номер заявления',
                                                     font=(None, 18, 'bold'),
@@ -37,7 +38,7 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
                                                                   text='число анкет',
                                                                   command=lambda: print('Apps are chosen'),
                                                                   variable=self.radio_var_scan_goal, value='apps')
-        validator_function = root.register(validator_uint)
+        validator_function = self.root.register(validator_uint)
         self.entry_scan_days = CTkEntry(master=self,
                                         width=75,
                                         placeholder_text='xxx',
@@ -117,8 +118,20 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
     def reconfigure_button_scan(self):
         if self.button_scan.cget('text') == BUTTON_LABEL_START_SCAN:
             self.button_scan.configure(text=BUTTON_LABEL_STOP_SCAN)
+            self.entry_app_num.configure(state=customtkinter.DISABLED)
+            self.entry_scan_days.configure(state=customtkinter.DISABLED)
+            self.entry_scan_apps.configure(state=customtkinter.DISABLED)
+            self.radiobutton_goal_days.configure(state=customtkinter.DISABLED)
+            self.radiobutton_goal_apps.configure(state=customtkinter.DISABLED)
         else:
             self.button_scan.configure(text=BUTTON_LABEL_START_SCAN)
+            self.entry_app_num.configure(state=customtkinter.NORMAL)
+            self.entry_scan_days.configure(state=customtkinter.NORMAL)
+            self.entry_scan_apps.configure(state=customtkinter.NORMAL)
+            self.radiobutton_goal_days.configure(state=customtkinter.NORMAL)
+            self.radiobutton_goal_apps.configure(state=customtkinter.NORMAL)
+        self.button_scan.configure(state=customtkinter.NORMAL)
+        self.root.after(1500, self.__unlock_button_scan)
 
     def update_status(self, image: Optional[customtkinter.CTkImage] = None, status: str = ''):
         self.image_label_status.configure(image=image, text=f'  {status}', require_redraw=True)
@@ -127,3 +140,6 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
     def __event_scan(self):
         if self.button_scan_cb is not None:
             self.button_scan_cb()
+
+    def __unlock_button_scan(self):
+        self.button_scan.configure(state=customtkinter.NORMAL)

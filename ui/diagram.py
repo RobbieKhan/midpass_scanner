@@ -85,6 +85,8 @@ class Diagram:
         self.appended_percent.append(percent)
 
     def build_appended(self):
+        if not self.appended_date:
+            return
         recordings_types_per_day: Dict[int, float] = dict()
         for rec_idx in range(0, len(self.appended_percent)):
             recordings_types_per_day[self.appended_percent[rec_idx]] = recordings_types_per_day.get(
@@ -113,6 +115,11 @@ class Diagram:
         recordings_types_per_day.clear()
         self.appended_percent.clear()
         self.appended_date = ''
+        plt.draw()
+
+    def clear(self):
+        self.ax.cla()
+        self.ax.set_ylabel('Доля паспортов на каждом этапе / день \n', fontsize='medium')
         plt.draw()
 
     def __create_legend(self):

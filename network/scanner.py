@@ -1,6 +1,5 @@
 import json
 import time
-import matplotlib.pyplot as plt
 import requests
 import threading
 from ui.diagram import Diagram
@@ -30,6 +29,8 @@ class Scanner:
 
         self.diagram: Optional[Diagram] = diagram
 
+        self.is_scan_in_progress: bool = False
+
     def set_consulate_code(self, code: int):
         self.consulate_code = str(code)
 
@@ -47,6 +48,7 @@ class Scanner:
         self.diagram = diagram
 
     def start_scanning(self):
+        self.is_scan_in_progress = True
         threading.Thread(target=self.__scan, daemon=True).start()
 
     def __scan(self):
@@ -117,7 +119,9 @@ class Scanner:
                     self.counter_access_blocked_attempts = 0
 
             if (self.depth_applications is not None and applications_scanned > self.depth_applications) or \
-                    (self.depth_days is not None and self.depth_days < days_scanned):
+                    (self.depth_days is not None and self.depth_days < days_scanned) or \
+                    not self.is_scan_in_progress:  # that indicator boolean is also used a stop flag
+                self.is_scan_in_progress = False
                 if self.diagram is not None:
                     self.diagram.build_appended()
                 print('Script is finished!')

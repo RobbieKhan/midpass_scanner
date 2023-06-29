@@ -32,10 +32,22 @@ class UI_WindowMain:
         self.root.quit()
 
     def __start_scanning(self):
-        if self.window_left_bar.is_application_number_valid():
-            self.scanner.set_consulate_code(self.window_left_bar.get_consulate_code())
-            self.scanner.set_application_date(self.window_left_bar.get_application_date_str())
-            self.scanner.set_application_number(self.window_left_bar.get_short_application_number())
-            self.scanner.set_scanning_depth(applications=571, days=73)
-            self.scanner.start_scanning()
-        print('Application number is invalid')
+        if not self.scanner.is_scan_in_progress:
+            if self.window_left_bar.is_application_number_valid():
+                self.scanner.set_consulate_code(self.window_left_bar.get_consulate_code())
+                self.scanner.set_application_date(self.window_left_bar.get_application_date_str())
+                self.scanner.set_application_number(self.window_left_bar.get_short_application_number())
+                self.scanner.set_scanning_depth(applications=571, days=73)
+                self.scanner.start_scanning()
+                # Reconfigure scan button - change its text on opposite
+                self.window_left_bar.reconfigure_button_scan()
+                # Clear an old graph
+                self.window_graph.get_diagram_instance().clear()
+            else:
+                print('Application number is invalid')
+        else:
+            # We are requested so stop scanning (button was pressed again)
+            self.scanner.is_scan_in_progress = False
+            # Reconfigure scan button - change its text on opposite
+            self.window_left_bar.reconfigure_button_scan()
+

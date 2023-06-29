@@ -118,7 +118,7 @@ class Scanner:
                     applications_scanned += 1
                     self.counter_access_blocked_attempts = 0
 
-            if (self.depth_applications is not None and applications_scanned > self.depth_applications) or \
+            if (self.depth_applications is not None and applications_scanned >= self.depth_applications) or \
                     (self.depth_days is not None and self.depth_days < days_scanned) or \
                     not self.is_scan_in_progress:  # that indicator boolean is also used a stop flag
                 self.is_scan_in_progress = False

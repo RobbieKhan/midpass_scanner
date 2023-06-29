@@ -26,14 +26,8 @@ if __name__.__eq__('__main__'):
     root.geometry(f'{GUI_WIDTH}x{GUI_HEIGHT}')
     root.title(f'{GUI_TITLE} {GUI_VERSION}')
     root.resizable(True, True)
+    root.minsize(GUI_WIDTH, GUI_HEIGHT)
     # root.wm_iconbitmap(ICON_WINDOW_ICON)
-
-    '''scan = Scanner()
-    scan.set_consulate_code(93104)
-    scan.set_application_number(11571)
-    scan.set_application_date('20230313')
-    scan.set_scanning_depth(applications=571, days=73)
-    scan.start_scanning()'''
 
     ui_main_window = UI_WindowMain(root)
     ui_main_window.ui_start_mainloop()

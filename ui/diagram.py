@@ -15,6 +15,7 @@ class Diagram:
     def __init__(self):
         self.fig, self.ax = plt.subplots()
         self.ax.tick_params(labelrotation=45)
+        self.ax.set_ylabel('Доля паспортов на каждом этапе / день \n', fontsize='medium')
         self.filename: str = ''
 
         self.appended_date: str = ''

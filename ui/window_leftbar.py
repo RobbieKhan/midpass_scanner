@@ -1,6 +1,7 @@
 from ui.constants import GUI_LEFT_BAR_WIDTH, GUI_HEIGHT
 from widgets.entry_validator import validator_uint
 from widgets.custom_entry import CTkEntry
+from icons.icons import Icons
 from typing import Callable, Optional
 import customtkinter
 
@@ -56,6 +57,12 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
         self.button_scan = customtkinter.CTkButton(master=self,
                                                    text=BUTTON_LABEL_START_SCAN,
                                                    command=self.__event_scan)
+        self.image_label_status = customtkinter.CTkLabel(master=self,
+                                                         compound=customtkinter.LEFT,
+                                                         image=Icons.icon_idle,
+                                                         text="  Сканирование не начато")
+
+        self.rowconfigure(7, weight=2)
 
         self.label_app_num.grid(row=0, column=0, columnspan=2, pady=(15, 0))
         self.entry_app_num.grid(row=1, column=0, columnspan=2, padx=10, pady=(10, 0))
@@ -65,6 +72,7 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
         self.radiobutton_goal_apps.grid(row=4, column=0, padx=10, pady=(10, 0), sticky=customtkinter.W)
         self.entry_scan_apps.grid(row=4, column=1, padx=10, pady=(10, 0), sticky=customtkinter.EW)
         self.button_scan.grid(row=5, column=0, columnspan=2, padx=10, pady=(25, 0), sticky=customtkinter.EW)
+        self.image_label_status.grid(row=8, column=0, columnspan=2, padx=10, pady=(25, 15), sticky=customtkinter.W)
 
         self.button_scan_cb: Optional[Callable] = None
 
@@ -111,6 +119,10 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
             self.button_scan.configure(text=BUTTON_LABEL_STOP_SCAN)
         else:
             self.button_scan.configure(text=BUTTON_LABEL_START_SCAN)
+
+    def update_status(self, image: Optional[customtkinter.CTkImage] = None, status: str = ''):
+        self.image_label_status.configure(image=image, text=f'  {status}', require_redraw=True)
+        self.image_label_status._image = image
 
     def __event_scan(self):
         if self.button_scan_cb is not None:

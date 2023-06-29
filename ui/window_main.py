@@ -29,7 +29,6 @@ class UI_WindowMain:
 
         self.spinner_task: Optional = None
         self.spinner_angle = 0
-        self.spinner_is_topped = True
 
     def ui_start_mainloop(self):
         # self.root.config(menu=self.menu_bar)
@@ -68,7 +67,6 @@ class UI_WindowMain:
         else:
             # We are requested so stop scanning (button was pressed again)
             self.scanner.is_scan_in_progress = False
-            self.spinner_is_stopped = True
 
     def __cb_scan_finished(self):
         self.window_left_bar.reconfigure_button_scan()
@@ -77,14 +75,13 @@ class UI_WindowMain:
                                            status='Сканирование завершено')
 
     def __start_spinner(self):
-        if not self.is_spinner_stopped:
-            self.window_left_bar.update_status(image=Icons.get_rotated_image(ICON_SCANNING, angle=self.spinner_angle),
-                                               status='Идет сканирование...')
-            self.spinner_angle -= 360 / 8
-            self.spinner_angle %= 360
+        self.window_left_bar.update_status(image=Icons.get_rotated_image(ICON_SCANNING, angle=self.spinner_angle),
+                                           status='Идет сканирование...')
+        self.spinner_angle -= 360 / 8
+        self.spinner_angle %= 360
+        if self.scanner.is_scan_in_progress:
             self.spinner_task = self.root.after(100, self.__start_spinner)
 
     def __stop_spinner(self):
         if self.spinner_task is not None:
             self.root.after_cancel(self.spinner_task)
-        self.spinner_is_stopped = True

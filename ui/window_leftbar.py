@@ -46,7 +46,7 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
                                         validatecommand=(validator_function, '%P', '%S'),
                                         limits=(1, None),
                                         justify=customtkinter.CENTER)
-        self.entry_scan_days.set('10')
+        self.entry_scan_days.set('60')
         self.entry_scan_apps = CTkEntry(master=self,
                                         width=75,
                                         placeholder_text='xxx',
@@ -54,7 +54,7 @@ class UI_WindowLeftBar(customtkinter.CTkFrame):
                                         validatecommand=(validator_function, '%P', '%S'),
                                         limits=(1, None),
                                         justify=customtkinter.CENTER)
-        self.entry_scan_apps.set('100')
+        self.entry_scan_apps.set('250')
         self.button_scan = customtkinter.CTkButton(master=self,
                                                    text=BUTTON_LABEL_START_SCAN,
                                                    command=self.__event_scan)

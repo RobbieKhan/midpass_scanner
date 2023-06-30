@@ -11,7 +11,7 @@ REQUEST_PERIOD_SEC = 0.1  # requests are done every 1 second
 MAX_CHECK_DEPTH_DAYS = 10  # the period of time during which the application information is searched.
 MAX_ACCESS_BLOCKED_ATTEMPTS_MIN = 1  # we don't want to stuck for more than 1 minute
 MAX_ACCESS_BLOCKED_ATTEMPTS_NUM = MAX_ACCESS_BLOCKED_ATTEMPTS_MIN * 60 / REQUEST_PERIOD_SEC  # maximal attempts number based on request period and maximal wait time
-
+MAX_CONNECTION_ERRORS = 10
 
 class Scanner:
     APPLICATION_TYPE = '2000'
@@ -66,10 +66,20 @@ class Scanner:
         applications_scanned = 0
         previous_date = None
         while True:
+            connection_errors_counter = 0
             time.sleep(REQUEST_PERIOD_SEC)
             application_full_url = REQUEST_URL + Scanner.APPLICATION_TYPE + self.consulate_code + \
                                    self.application_date + str(self.application_number).zfill(8)
-            r = requests.get(application_full_url, headers=REQUEST_REQUIRED_HEADERS)
+            try:
+                connection_errors_counter = 0
+                r = requests.get(application_full_url, headers=REQUEST_REQUIRED_HEADERS)
+            except Exception as e:
+                print('Communication error!')
+                connection_errors_counter += 1
+                if connection_errors_counter < MAX_CONNECTION_ERRORS:
+                    print('Too many communication errors in a row!')
+                    break
+                continue
             # Parse result
             if 200 == r.status_code:
                 # It maybe a valid result or just an empty request if such application is missing

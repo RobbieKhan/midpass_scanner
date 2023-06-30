@@ -1,8 +1,8 @@
 import time
-import constants
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from ui.constants import *
 from typing import List, Dict
 from collections import OrderedDict
 
@@ -15,6 +15,7 @@ class Diagram:
     def __init__(self):
         self.fig, self.ax = plt.subplots()
         self.ax.tick_params(labelrotation=45)
+        self.ax.set_ylabel('Доля паспортов на каждом этапе / день \n', fontsize='medium')
         self.filename: str = ''
 
         self.appended_date: str = ''
@@ -37,7 +38,7 @@ class Diagram:
         self.filename = filename
 
     def build_from_file(self):
-        file = open(constants.RESULTS_DIRECTORY_NAME + self.filename, 'r')
+        file = open(RESULTS_DIRECTORY_NAME + self.filename, 'r')
         file_recordings: List[str] = file.readlines()
         file.close()
         recordings_number: int = len(file_recordings)
@@ -54,7 +55,7 @@ class Diagram:
                 recordings_sum = sum(recordings_types_per_day.values())
                 for item_idx in recordings_types_per_day:
                     recordings_types_per_day[item_idx] = recordings_types_per_day[item_idx] / recordings_sum
-                recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
+                recordings_types_per_day[next(iter(recordings_types_per_day))] += 1.0 - sum(recordings_types_per_day.values())
                 # Sort data by internal status (in percents)
                 recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
                 # Start plotting
@@ -84,6 +85,8 @@ class Diagram:
         self.appended_percent.append(percent)
 
     def build_appended(self):
+        if not self.appended_percent:
+            return
         recordings_types_per_day: Dict[int, float] = dict()
         for rec_idx in range(0, len(self.appended_percent)):
             recordings_types_per_day[self.appended_percent[rec_idx]] = recordings_types_per_day.get(
@@ -92,7 +95,7 @@ class Diagram:
         recordings_sum = sum(recordings_types_per_day.values())
         for item_idx in recordings_types_per_day:
             recordings_types_per_day[item_idx] = round(recordings_types_per_day[item_idx] / recordings_sum, 2)
-        recordings_types_per_day[0] += 1.0 - sum(recordings_types_per_day.values())
+        recordings_types_per_day[next(iter(recordings_types_per_day))] += 1.0 - sum(recordings_types_per_day.values())
         # Sort data by internal status (in percents)
         recordings_types_per_day_sorted = OrderedDict(sorted(recordings_types_per_day.items(), reverse=True))
         # Start plotting
@@ -114,12 +117,19 @@ class Diagram:
         self.appended_date = ''
         plt.draw()
 
+    def clear(self):
+        self.ax.cla()
+        self.ax.set_ylabel('Доля паспортов на каждом этапе / день \n', fontsize='medium')
+        plt.draw()
+
     def __create_legend(self):
         patches = list()
         for idx, _ in enumerate(self.statuses):
+            if 90 == list(self.statuses.keys())[idx]:
+                # This status is never met anyway
+                continue
             color = list(self.statuses.values())[idx][STATUS_COLOR_IDX]
             label = list(self.statuses.values())[idx][STATUS_LABEL_IDX]
-            print(idx, color)
             patch = mpatches.Patch(color=color, label=label)
             patches.append(patch)
-        self.fig.legend(handles=patches, ncol=len(patches) / 2, loc='upper center')
+        self.fig.legend(handles=patches, ncol=len(patches) / 3, loc='upper center')

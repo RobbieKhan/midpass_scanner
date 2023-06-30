@@ -1,23 +1,22 @@
 import json
 import time
-import matplotlib.pyplot as plt
 import requests
-import constants
 import threading
+from ui.diagram import Diagram
+from ui.constants import *
 from datetime import datetime, timedelta
-from diagram import Diagram
-from typing import Optional
+from typing import Optional, Callable
 
 REQUEST_PERIOD_SEC = 0.1  # requests are done every 1 second
 MAX_CHECK_DEPTH_DAYS = 10  # the period of time during which the application information is searched.
 MAX_ACCESS_BLOCKED_ATTEMPTS_MIN = 1  # we don't want to stuck for more than 1 minute
 MAX_ACCESS_BLOCKED_ATTEMPTS_NUM = MAX_ACCESS_BLOCKED_ATTEMPTS_MIN * 60 / REQUEST_PERIOD_SEC  # maximal attempts number based on request period and maximal wait time
-
+MAX_CONNECTION_ERRORS = 10
 
 class Scanner:
     APPLICATION_TYPE = '2000'
 
-    def __init__(self):
+    def __init__(self, diagram: Optional[Diagram] = None):
         self.consulate_code: Optional[str] = None
         self.application_date: Optional[str] = None
         self.application_number: Optional[int] = None
@@ -28,7 +27,10 @@ class Scanner:
         self.counter_access_blocked_attempts: int = 0
         self.counter_no_info: int = 0
 
-        self.diagram = Diagram()
+        self.diagram: Optional[Diagram] = diagram
+
+        self.is_scan_in_progress: bool = False
+        self.cb_finished_scan: Optional[Callable] = None
 
     def set_consulate_code(self, code: int):
         self.consulate_code = str(code)
@@ -43,24 +45,41 @@ class Scanner:
         self.depth_days = days
         self.depth_applications = applications
 
+    def set_diagram_instance(self, diagram: Diagram):
+        self.diagram = diagram
+
     def start_scanning(self):
+        self.is_scan_in_progress = True
         threading.Thread(target=self.__scan, daemon=True).start()
-        plt.show()
+
+    def set_cb_finished_scan(self, cb: Optional[Callable]):
+        self.cb_finished_scan = cb
 
     def __scan(self):
         # Create file with results
         filename = f'results_{datetime.now().strftime("%Y%m%d")}.txt'
-        file = open(constants.RESULTS_DIRECTORY_NAME + filename, 'w')
-        self.diagram.set_filename(filename)
+        file = open(RESULTS_DIRECTORY_NAME + filename, 'w')
+        if self.diagram is not None:
+            self.diagram.set_filename(filename)
         # Start scanning
         days_scanned = 0
         applications_scanned = 0
         previous_date = None
         while True:
+            connection_errors_counter = 0
             time.sleep(REQUEST_PERIOD_SEC)
-            application_full_url = constants.REQUEST_URL + Scanner.APPLICATION_TYPE + self.consulate_code + \
+            application_full_url = REQUEST_URL + Scanner.APPLICATION_TYPE + self.consulate_code + \
                                    self.application_date + str(self.application_number).zfill(8)
-            r = requests.get(application_full_url, headers=constants.REQUEST_REQUIRED_HEADERS)
+            try:
+                connection_errors_counter = 0
+                r = requests.get(application_full_url, headers=REQUEST_REQUIRED_HEADERS)
+            except Exception as e:
+                print('Communication error!')
+                connection_errors_counter += 1
+                if connection_errors_counter < MAX_CONNECTION_ERRORS:
+                    print('Too many communication errors in a row!')
+                    break
+                continue
             # Parse result
             if 200 == r.status_code:
                 # It maybe a valid result or just an empty request if such application is missing
@@ -71,11 +90,12 @@ class Scanner:
                     print(result)
                     file.write(result + '\n')
                     # Notify diagram builder
-                    if previous_date != json_response['receptionDate'] and previous_date is not None:
-                        # Date has changed. Build all collected data for the previous day
-                        self.diagram.build_appended()
-                    previous_date = json_response['receptionDate']
-                    self.diagram.append_data(date=previous_date, percent=json_response['internalStatus']['percent'])
+                    if self.diagram is not None:
+                        if previous_date != json_response['receptionDate'] and previous_date is not None:
+                            # Date has changed. Build all collected data for the previous day
+                            self.diagram.build_appended()
+                        previous_date = json_response['receptionDate']
+                        self.diagram.append_data(date=previous_date, percent=json_response['internalStatus']['percent'])
                     # Go to further application
                     self.application_number -= 1
                     applications_scanned += 1
@@ -112,10 +132,15 @@ class Scanner:
                     applications_scanned += 1
                     self.counter_access_blocked_attempts = 0
 
-            if (self.depth_applications is not None and applications_scanned > self.depth_applications) or \
-                    (self.depth_days is not None and self.depth_days < days_scanned):
-                self.diagram.build_appended()
+            if (self.depth_applications is not None and applications_scanned >= self.depth_applications) or \
+                    (self.depth_days is not None and self.depth_days < days_scanned) or \
+                    not self.is_scan_in_progress:  # that indicator boolean is also used a stop flag
+                self.is_scan_in_progress = False
+                if self.diagram is not None:
+                    self.diagram.build_appended()
                 print('Script is finished!')
+                if self.cb_finished_scan is not None:
+                    self.cb_finished_scan()
                 break
 
         file.close()

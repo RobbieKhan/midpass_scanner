@@ -4,7 +4,7 @@ REQUEST_REQUIRED_HEADERS = {'User-Agent': 'Mozilla/4.0 (Macintosh; Intel Mac OS 
                                           '(KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 GUI_TITLE = 'Сканер заявлений на загранпаспорт'
-GUI_VERSION = '1.0.0'
+GUI_VERSION = '2.0.0'
 
 GUI_HEIGHT = 630
 GUI_WIDTH = 850

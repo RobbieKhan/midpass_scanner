@@ -1,0 +1,5 @@
+matplotlib~=3.7.1
+customtkinter~=5.0.5
+Pillow~=7.1.2
+tendo~=0.2.15
+requests~=2.31.0
